@@ -18,7 +18,10 @@
     "url": "https://github.com/marcinfuja/node/issues"
   },
   "homepage": "https://github.com/marcinfuja/node#readme",
-  "dependencies": {},
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
   "devDependencies": {
     "nodemon": "^2.0.7"
   }
