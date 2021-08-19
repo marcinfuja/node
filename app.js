@@ -1,57 +1,20 @@
-const http = require('http');
-const fs = require('fs');
-const { parse } = require('path');
+const path = require('path');
+const express = require('express');
+const app = express();
 
-const server = http.createServer((req, res) => {
-    const url = req.url;
-    const method = req.method;
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
-    if (url === '/') {
-        res.write(`
-            <html>
-                <head>
-                    <title>Enter Message</title>
-                </head>
-                <body>
-                    <form action="/message" method="POST">
-                        <input type="text" name="message" />
-                        <button type="submit">Send</button>
-                    </form>
-                </body>
-            </html>
-        `);
-        return res.end();
-    }
+const bodyParser = require('body-parser');
 
-    if (url === '/message' && method === 'POST') {
-        const body = [];
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.static(path.join(__dirname, 'public')))
 
-        req.on('data', (chunk) => {
-            console.log(chunk);
-            body.push(chunk);
-        });
-        req.on('end', () => {
-            const parsedBody = Buffer.concat(body).toString();
-            const message = parsedBody.split('=')[1];
-            fs.writeFileSync('message.txt', message);
-        });
-        res.statusCode = 302;
-        res.setHeader('Location', '/');
-        return res.end();
-    }
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
-    res.setHeader('Content-Type', 'text/html');
-    res.write(`
-        <html>
-            <head>
-                <title>My first page</title>
-            </head>
-            <body>
-                <h1>Hello from my Node.js Server!</h1>
-            </body>
-        </html>
-    `);
-    res.end();
+app.use((req, res, next) => {
+    res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
-server.listen(3000);
+app.listen(3000);
